@@ -1,0 +1,7 @@
+s3fs
+pandas
+dask
+bokeh
+distributed
+pyarrow
+ipywidgets
