@@ -5,3 +5,4 @@ distributed
 ipywidgets
 dask-mongo
 pymongoarrow
+mtools

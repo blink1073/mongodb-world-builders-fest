@@ -1,0 +1,31 @@
+mlaunch kill; true
+rm -rf data
+
+VERSION=`cat VERSION`
+PORT=`cat PORT`
+MONGODB_BIN=`m bin $VERSION`
+
+replcmd="mlaunch init --binarypath \
+$MONGODB_BIN --replicaset --name repl0 --nodes 3 --port $PORT --hostname localhost --setParameter --priority \
+enableTestCommands=1"
+singlecmd="mlaunch init --binarypath \
+$MONGODB_BIN --single --port $PORT --hostname localhost --setParameter \
+enableTestCommands=1"
+shardedcmd="mlaunch init --binarypath \
+$MONGODB_BIN --sharded 3 --replicaset --name repl0 --port $PORT --hostname localhost --setParameter \
+enableTestCommands=1"
+
+if [[ "$1" == "single" ]]; then
+    cmd=$singlecmd
+elif [[ "$1" == "repl" ]]; then
+    cmd=$replcmd
+elif [[ "$1" == "sharded" ]]; then
+    cmd=$shardedcmd
+else
+    cmd=$singlecmd
+fi
+
+echo $cmd
+eval $cmd
+
+mlaunch list
