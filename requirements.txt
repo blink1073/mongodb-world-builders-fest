@@ -6,3 +6,4 @@ ipywidgets
 dask-mongo
 pymongoarrow
 mtools
+paramiko

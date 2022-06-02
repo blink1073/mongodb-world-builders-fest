@@ -1,2 +1,4 @@
 dask-worker-space/
 data
+*.parquet
+report.xml
