@@ -2,3 +2,4 @@ dask-worker-space/
 data
 *.parquet
 report.xml
+host_list.txt

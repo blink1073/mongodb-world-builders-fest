@@ -27,14 +27,19 @@ SCHEDULER_PORT = 8001
 dask_proc = subprocess.Popen([f'dask-scheduler --port {SCHEDULER_PORT}'])
 
 # Find the remote hosts using nmap
+# Bridge is created using System Preferences > Sharing > Internet Sharing
+# with the ethernet adapter port.
 run('nmap -T4 -v -sn 192.168.2.0/24 -oX report.xml')
 
-# Parse the report.xml
+# Parse the report.xml to get the available hosts.
 hosts = []
 mytree = ET.parse('report.xml')
 for host in mytree.findall('host'):
     if host.find('status').get('state') != 'down':
         hosts.append(host.find('address').get('addr'))
+
+with open('host_list.txt', 'w') as fid:
+    fid.writelines(hosts)
 
 # Set up each host.
 for host in hosts:
