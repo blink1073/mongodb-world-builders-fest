@@ -2,10 +2,8 @@ import atexit
 import os
 import shlex
 import subprocess
+import sys
 import time
-import xml.etree.ElementTree as ET
-
-from paramiko import SSHClient
 from pymongo.mongo_client import MongoClient
 from pymongo.errors import OperationFailure
 
@@ -29,36 +27,10 @@ SCHEDULER_PORT = 8001
 dask_proc = subprocess.Popen(['dask-scheduler', '--host', DASK_HOST, '--port', str(SCHEDULER_PORT)])
 atexit.register(dask_proc.kill)
 
-# Find the remote hosts using nmap
-# Bridge is created using System Preferences > Sharing > Internet Sharing
-# with the ethernet adapter port.
-#run('nmap -T4 -v -sn 192.168.2.0/24 -oX report.xml', check=True)
-
-# Parse the report.xml to get the available hosts.
-hosts = []
-mytree = ET.parse('report.xml')
-for host in mytree.findall('host'):
-    if host.find('status').get('state') != 'down':
-        hosts.append(host.find('address').get('addr'))
-
-with open('host_list.txt', 'w') as fid:
-    fid.writelines(hosts)
-
-# Set up each host.
-for host in hosts:
-    PASSWORD = os.environ['RPI_PASSWORD']
-    client = SSHClient()
-    client.load_system_host_keys()
-    client.connect(host, username='silvester', password=PASSWORD)
-    # Kill any running mongodb and dask-workers
-    client.exec_command('pkill -9 -f "dask-worker"')
-    client.exec_command('pkill -9 mongod')
-    client.exec_command('sleep 3')
-    # Start mongodb and dask-worker for the scheduler
-    client.exec_command('mkdir -p ./data')
-    client.exec_command(f'nohup mongod --replSet "rs0" --bind_ip {host} --dbpath ./data &')
-    client.exec_command(f'nohup dask-worker tcp://{DASK_HOST}:{SCHEDULER_PORT} &')
-    client.close()
+# Set up the hosts.
+run([sys.executable, 'setup_hosts.py'], check=True)
+with open('host_list.txt') as fid:
+    hosts = fid.readlines()
 
 # Start the local mongodb.
 os.makedirs('./data', exist_ok=True)

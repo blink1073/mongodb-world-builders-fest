@@ -1,0 +1,46 @@
+Raspberry Pi Notes
+
+Started from 64bit Raspberry PI Lite
+
+Enable SSH
+https://phoenixnap.com/kb/enable-ssh-raspberry-pi
+sudo touch /boot/ssh
+
+Set up Wifi & Restart
+https://raspberryexpert.com/raspberry-pi-wifi-setup/
+sudo raspi-config
+
+Set up MongoDB
+https://www.mongodb.com/developer/products/mongodb/mongodb-on-raspberry-pi/
+sudo apt update
+sudo apt upgrade
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+sudo apt-get update
+sudo apt-get install -y mongodb-org
+
+Set up Python
+wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh
+pip install psutil mtools pymongo python-dateutil ipython dask distributed
+
+
+Start Services - Need to be able to bind to a replicaset as well
+mongod --replSet "rs0" --bind_ip <known_host> --dbpath ./data
+dask-worker tcp://xxx.xxx.xx.xxx
+
+Write a script that takes an ip and a dask-scheduler addr and starts mongo and dask-worker on that Pi
+
+Start a replicaset using known ips
+https://www.mongodb.com/docs/manual/tutorial/deploy-replica-set/
+
+$ mongosh
+
+rs.initiate( {
+   _id : "rs0",
+   members: [
+      { _id: 0, host: "169.254.1.221:27017" },
+      { _id: 1, host: "localhost27017" },
+   ]
+})
+
+
