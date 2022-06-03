@@ -17,6 +17,7 @@ def run(cmd, **kwargs):
 
 
 def start_host(host):
+    print('Starting host:', host)
     PASSWORD = os.environ['RPI_PASSWORD']
     client = SSHClient()
     client.load_system_host_keys()
