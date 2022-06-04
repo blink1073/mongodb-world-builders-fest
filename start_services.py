@@ -32,7 +32,7 @@ atexit.register(dask_proc.kill)
 # Set up the hosts.
 run([sys.executable, 'setup_hosts.py'], check=True)
 with open('host_list.txt') as fid:
-    hosts = fid.readlines()
+    hosts = [host.strip() for host in fid.readlines()]
 
 # Start the local mongodb.
 if os.path.exists('./data'):
@@ -42,29 +42,26 @@ cmd = f'{MONGO} --fork --logpath ./data/mongod.log --replSet "rs0" --bind_ip {HO
 mongo_proc = subprocess.Popen(shlex.split(cmd))
 atexit.register(mongo_proc.kill)
 
-# Start the replicaset.
-init_doc = dict(_id="rs0", members=[dict(_id=0, host=f"{HOST}:27017")])
-for (i, host) in enumerate(hosts):
-    init_doc["members"].append(dict(_id=i + 1, host=f"{host}:27017"))  # type:ignore
-print(init_doc)
-
+# Wait for replicaset to start up.
+print('\nWaiting for replicaset')
 con = MongoClient(f"{HOST}:27017", directConnection=True)
 for i in range(30):
     try:
-        resp = con['admin'].command({'replSetInitiate': init_doc})
+        resp = con['admin'].command({'replSetGetStatus': 1})
         assert resp["ok"]
+        print('\nReplicaset was initiated!')
         break
     except OperationFailure as e:
         print(str(e) + " - will retry")  # type:ignore
         time.sleep(1)
+con.close()
 
-
-con = MongoClient(f"{HOST}:27017")
+con = MongoClient(f"{HOST}:27017", replicaset="rs0")
 con.admin.command('ping')
 print('\n\nStarted Mongo Replicaset:')
 print(con.topology_description)
 print('\n\n')
-
+con.close()
 
 while 1:
     try:

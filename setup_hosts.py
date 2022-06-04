@@ -43,7 +43,7 @@ def execute_chan(chan, cmd):
 
 
 def start_host(host):
-    print('Starting host:', host)
+    print('\n\nStarting host:', host)
     PASSWORD = os.environ['RPI_PASSWORD']
     client = SSHClient()
     client.load_system_host_keys()
@@ -66,19 +66,19 @@ def start_host(host):
     channel.close()
 
     client.close()
-    print('Finished host:', host)
+    print('Finished host:', host, '\n\n')
 
 
 pool = ThreadPoolExecutor(1)
 hosts = []
 futures = []
 
-# Check ports 2-254.
-for i in range(2, 255):
+# Check ports 2-10.
+for i in range(2, 10):
     host = f'192.168.2.{i}'
     try:
         run(f'ping {host} -o -t 1', check=True)
-        hosts.append(host)
+        hosts.append(host + '\n')
         futures.append(pool.submit(start_host, host))
     except Exception:
         pass

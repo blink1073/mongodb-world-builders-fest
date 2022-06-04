@@ -7,3 +7,4 @@ dask-mongo
 pymongoarrow
 mtools
 paramiko
+notebook==7.0.0a4
