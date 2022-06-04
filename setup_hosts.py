@@ -8,7 +8,7 @@ from paramiko import SSHClient
 
 PARENT_HOST = '192.168.2.1'
 SCHEDULER_PORT = 8001
-
+PASSWORD = os.environ['RPI_PASSWORD']
 
 def run(cmd, **kwargs):
     if isinstance(cmd, str):
@@ -18,6 +18,7 @@ def run(cmd, **kwargs):
 
 
 def execute(ssh, cmd):
+    print('> ' + cmd)
     _, stdout, stderr = ssh.exec_command(cmd, get_pty=True)
     for line in iter(stdout.readline, ""):
         print(line, end="")
@@ -25,6 +26,7 @@ def execute(ssh, cmd):
         print(line, end="")
 
 def execute_chan(chan, cmd):
+    print('> ' + cmd)
     buff = ''
     while not buff.strip().endswith('$'):
         resp = ''
@@ -44,7 +46,6 @@ def execute_chan(chan, cmd):
 
 def start_host(host):
     print('\n\nStarting host:', host)
-    PASSWORD = os.environ['RPI_PASSWORD']
     client = SSHClient()
     client.load_system_host_keys()
     client.connect(host, username='silvester', password=PASSWORD)
@@ -87,3 +88,5 @@ with open('host_list.txt', 'w') as fid:
     fid.writelines(hosts)
 
 wait(futures)
+for future in futures:
+    future.result()

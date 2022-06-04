@@ -21,8 +21,7 @@ sudo apt-get install -y mongodb-org
 
 Set up Python
 wget https://github.com/conda-forge/miniforge/releases/latest/download/Miniforge3-Linux-aarch64.sh
-pip install psutil mtools pymongo python-dateutil ipython dask distributed
-
+pip install psutil mtools pymongo python-dateutil ipython dask distributed msgpack==1.0.3 numpy==1.22.4 pandas==1.4.2
 
 Start Services - Need to be able to bind to a replicaset as well
 mongod --replSet "rs0" --bind_ip <known_host> --dbpath ./data
@@ -43,4 +42,6 @@ rs.initiate( {
    ]
 })
 
+
+Needed to run "sudo ip route delete default" when we couldn't connect to pip
 

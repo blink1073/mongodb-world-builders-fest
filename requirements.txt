@@ -1,10 +1,13 @@
 s3fs
-pandas
 bokeh
 distributed
 ipywidgets
 dask-mongo
 pymongoarrow
+pymongo
 mtools
 paramiko
 notebook==7.0.0a4
+msgpack==1.0.3
+numpy==1.22.4
+pandas==1.4.2
