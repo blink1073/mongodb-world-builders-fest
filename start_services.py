@@ -10,7 +10,7 @@ from pymongo.errors import OperationFailure
 
 
 HOST = '192.168.2.1'
-MONGO = '/Users/steve.silvester/.local/m/versions/4.4.0/bin/mongod'
+MONGO = os.environ['MONGO_BINARY']
 
 
 def run(cmd, **kwargs):

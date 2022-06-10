@@ -8,6 +8,7 @@ from paramiko import SSHClient
 
 PARENT_HOST = '192.168.2.1'
 SCHEDULER_PORT = 8001
+USERNAME = os.environ['RPI_USERNAME']
 PASSWORD = os.environ['RPI_PASSWORD']
 
 def run(cmd, **kwargs):
@@ -48,7 +49,7 @@ def start_host(host):
     print('\n\nStarting host:', host)
     client = SSHClient()
     client.load_system_host_keys()
-    client.connect(host, username='silvester', password=PASSWORD)
+    client.connect(host, username=USERNAME, password=PASSWORD)
 
     # Set up tasks.
     execute(client, 'uname -a')
@@ -62,7 +63,7 @@ def start_host(host):
     execute(client, f'mongod --fork --logpath ./data/mongod.log --replSet "rs0" --bind_ip {host} --dbpath ./data')
 
     channel = client.invoke_shell('bash')
-    execute_chan(channel, f'PATH="/home/silvester/miniforge3/bin:$PATH"; nohup dask-worker tcp://{PARENT_HOST}:{SCHEDULER_PORT} &')
+    execute_chan(channel, f'PATH="$HOME/miniforge3/bin:$PATH"; nohup dask-worker tcp://{PARENT_HOST}:{SCHEDULER_PORT} &')
     time.sleep(2)
     channel.close()
 
